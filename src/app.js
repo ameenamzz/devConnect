@@ -1,12 +1,24 @@
 const express = require("express");
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("home Page Devconnect");
+// app.use("/about/2", (req, res) => {
+//   res.send("slowwww");
+// });
+
+app.get("/user", (req, res) => {
+  res.send({ name: "Ameen", city: "ksd" });
 });
 
-app.get("/about", (req, res) => {
-  res.send("about Page");
+app.post("/user", (req, res) => {
+  res.send("data stored succesfully....");
+});
+
+app.delete("/user", (req, res) => {
+  res.send("data deleted succesfully....");
+});
+
+app.use("/", (req, res) => {
+  res.send("home Page Dev");
 });
 
 app.listen(7777, () => {
