@@ -5,21 +5,18 @@ const app = express();
 //   res.send("slowwww");
 // });
 
-app.get("/user", (req, res) => {
-  res.send({ name: "Ameen", city: "ksd" });
-});
-
-app.post("/user", (req, res) => {
-  res.send("data stored succesfully....");
-});
-
-app.delete("/user", (req, res) => {
-  res.send("data deleted succesfully....");
-});
-
-app.use("/", (req, res) => {
-  res.send("home Page Dev");
-});
+app.use(
+  "/user",
+  (req, res, next) => {
+    console.log("1st route handler.");
+    next();
+    // res.send("1st Response...");
+  },
+  (req, res) => {
+    console.log("2nd Router handler.");
+    res.send("2nd Response... ");
+  }
+);
 
 app.listen(7777, () => {
   console.log("app is listening to port 7777...");
