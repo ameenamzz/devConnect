@@ -1,37 +1,59 @@
 const express = require("express");
 const app = express();
-app.listen(7777, () => {
-  console.log("app is listening to port 7777...");
-});
+const connectDB = require("./config/database");
+const User = require("./models/user");
 
-//------MIDDLEWARE--------
-// const { adminAuth, uesrAuth } = require("./middlewares/auth");
+app.use(express.json());
 
-// app.use("/admin", adminAuth);
+app.post("/signup", async (req, res) => {
+  const user = new User(req.body); //CREATING A NEW INSTANCE OF USER MODEL
 
-// app.get("/admin/getAllData", (req, res) => {
-//   res.send("All Data sent...");
-// });
-
-// app.get("/admin/deleteAllData", (req, res) => {
-//   res.send("Deleted all data");
-// });
-
-// app.get("/user/getAlldata", uesrAuth, (req, res) => {
-//   res.send("user data sent");
-// });
-
-// app.post("/user/login", (req, res) => {
-//   res.send("login sucussfull");
-// });
-
-app.get("/user", (req, res, next) => {
-  throw new Error("erorororor");
-  res.send("helo");
-});
-
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("something went wrond!!!!");
+  try {
+    await user.save(); //ADDING THE DATA TO DATABASE
+    res.send("User Added Successfully");
+    console.log(user);
+  } catch (err) {
+    res.status(400).send("Something went wrong");
   }
 });
+
+// GETTING USERS FROM DATABASE
+// gettting one user
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.email;
+  try {
+    const user = await User.find({ email: userEmail });
+    if (user.length === 0) {
+      res.status(404).send("No user found");
+    } else {
+      res.send(user);
+    }
+  } catch (err) {
+    res.status(400).send("Something went wrong");
+  }
+});
+
+// getting all users
+app.get("/feed", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    if (!allUsers) {
+      res.status(404).send("No user found");
+    } else {
+      res.send(allUsers);
+    }
+  } catch (err) {
+    res.status(400).send("Something went wrong");
+  }
+});
+
+connectDB()
+  .then(() => {
+    console.log("Cluster Connection Established Succesfully...");
+    app.listen(7777, () => {
+      console.log("app is listening to port 7777...");
+    });
+  })
+  .catch((err) => {
+    console.log("something went wrong!!");
+  });
