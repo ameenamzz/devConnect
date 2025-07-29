@@ -49,10 +49,11 @@ app.get("/feed", async (req, res) => {
 
 // DELETE USER
 
-app.delete("/userDelete", async (req, res) => {
-  const deleteUser = req.body.firstName;
+app.delete("/user", async (req, res) => {
+  const { id } = req.body;
   try {
-    const user = await User.deleteOne({ firstName: deleteUser });
+    const user = await User.findByIdAndDelete(id);
+    console.log(user);
     res.send("User Deleted Sucessfully!");
   } catch (error) {
     res.status(400).send("Something went wrong");
@@ -61,7 +62,7 @@ app.delete("/userDelete", async (req, res) => {
 
 // UPDATING USER DETAILS
 
-app.patch("/userUpdate", async (req, res) => {
+app.patch("/user", async (req, res) => {
   const { id, ...user } = req.body;
   try {
     const updateUser = await User.findByIdAndUpdate(id, user);
