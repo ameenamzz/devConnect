@@ -77,9 +77,9 @@ app.patch("/user/:id", async (req, res) => {
     }
 
     // NOT ALLOWING MORE THAN 10 SKILLS
-    if (user.skills.length > 10) {
-      throw new Error("skills more than 10 not allowed");
-    }
+    // if (user.skills.length > 10) {
+    //   throw new Error("skills more than 10 not allowed");
+    // }
     const updateUser = await User.findByIdAndUpdate(id, user, {
       runValidators: true,
     });
