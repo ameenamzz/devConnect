@@ -8,12 +8,12 @@ const bcrypt = require("bcrypt");
 app.use(express.json());
 
 // ADDING USERS TO DATABASE
+// Sign Up
 app.post("/signup", async (req, res) => {
   try {
     validateSignUpData(req);
     const { firstName, lastName, email, password, age, skills } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
-
     const user = new User({
       firstName,
       lastName,
@@ -25,6 +25,26 @@ app.post("/signup", async (req, res) => {
     await user.save(); //ADDING THE DATA TO DATABASE
     res.send("User Added Successfully");
     console.log(user);
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
+
+//Sign In
+app.post("/login", async (req, res) => {
+  try {
+    const { password, email } = req.body;
+    const user = await User.findOne({ email: email });
+    console.log(user);
+    if (!user) {
+      throw new Error("email not valid");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (isPasswordValid) {
+      res.send("Login Succesfull");
+    } else {
+      throw new Error("Password not valid");
+    }
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
@@ -61,7 +81,6 @@ app.get("/feed", async (req, res) => {
 });
 
 // DELETE USER
-
 app.delete("/user", async (req, res) => {
   const { id } = req.body;
   try {
@@ -74,7 +93,6 @@ app.delete("/user", async (req, res) => {
 });
 
 // UPDATING USER DETAILS
-
 app.patch("/user/:id", async (req, res) => {
   const { ...user } = req.body;
   const id = req.params?.id; // getting the user id from url
@@ -101,6 +119,8 @@ app.patch("/user/:id", async (req, res) => {
   }
 });
 
+
+// DB AND SERVER CONNECTION
 connectDB()
   .then(() => {
     console.log("Cluster Connection Established Succesfully...");
