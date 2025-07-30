@@ -40,7 +40,6 @@ app.post("/login", async (req, res) => {
   try {
     const { password, email } = req.body;
     const user = await User.findOne({ email: email });
-    console.log(user);
     if (!user) {
       throw new Error("email not valid");
     }
@@ -48,7 +47,9 @@ app.post("/login", async (req, res) => {
     if (isPasswordValid) {
       //--- JWT TOKEN ----
 
-      const token = jwt.sign({ _id: user._id }, "DEV@connect123"); // 1- CREATE A JWT TOKEN
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      }); // 1- CREATE A JWT TOKEN
       res.cookie("token", token); // 2- ADD THE TOKEN TO COOKIE AND SEND IT TO USER
       res.send("Login Succesfull");
     } else {
