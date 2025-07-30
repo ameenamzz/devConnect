@@ -5,7 +5,12 @@ const User = require("./models/user");
 const { Error } = require("mongoose");
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+var cookieParser = require("cookie-parser");
+var jwt = require("jsonwebtoken");
+require("dotenv").config();
+
 app.use(express.json());
+app.use(cookieParser());
 
 // ADDING USERS TO DATABASE
 // Sign Up
@@ -41,10 +46,33 @@ app.post("/login", async (req, res) => {
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (isPasswordValid) {
+      //--- JWT TOKEN ----
+
+      const token = jwt.sign({ _id: user._id }, "DEV@connect123"); // 1- CREATE A JWT TOKEN
+      res.cookie("token", token); // 2- ADD THE TOKEN TO COOKIE AND SEND IT TO USER
       res.send("Login Succesfull");
     } else {
       throw new Error("Password not valid");
     }
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
+
+app.get("/profile", async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    if (!token) {
+      throw new Error("Invalid token");
+    }
+    const decode = await jwt.verify(token, process.env.JWT_SECRET);
+    const { _id } = decode;
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("Invalid User");
+    }
+    console.log(decode);
+    res.send(user);
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
@@ -118,7 +146,6 @@ app.patch("/user/:id", async (req, res) => {
     res.status(400).send("Something went wrong");
   }
 });
-
 
 // DB AND SERVER CONNECTION
 connectDB()
