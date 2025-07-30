@@ -6,7 +6,7 @@ const { Error } = require("mongoose");
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
 var cookieParser = require("cookie-parser");
-var jwt = require("jsonwebtoken");
+// var jwt = require("jsonwebtoken");
 const { userAuth } = require("./middlewares/auth");
 
 app.use(express.json());
@@ -43,13 +43,10 @@ app.post("/login", async (req, res) => {
     if (!user) {
       throw new Error("email not valid");
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.validatePassword(password); // CHECK PASSWORD IS MATCHING OR NOT
     if (isPasswordValid) {
       //--- JWT TOKEN ----
-
-      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      }); // 1- CREATE A JWT TOKEN
+      const token = await user.getJWT(); // 1- CREATE A JWT TOKEN
       res.cookie("token", token); // 2- ADD THE TOKEN TO COOKIE AND SEND IT TO USER
       res.send("Login Succesfull");
     } else {
@@ -72,7 +69,7 @@ app.get("/profile", userAuth, async (req, res) => {
 app.get("/sendConnectionRequest", userAuth, async (req, res) => {
   try {
     const user = req.user;
-    res.send(user.firstName);
+    res.send(user.lastName);
   } catch (err) {
     res.status(404).send("ERROR: " + err.message);
   }
