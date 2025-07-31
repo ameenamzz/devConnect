@@ -12,6 +12,8 @@ const validateSignUpData = (req) => {
 };
 
 const validateAllowedProfileEdit = (req) => {
+//TODO : Also need to validate each Field because user can enter any data into each field
+
   const allowedProfileEditField = [
     "age",
     "skills",
