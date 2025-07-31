@@ -1,80 +1,37 @@
 const express = require("express");
 const app = express();
 const connectDB = require("./config/database");
-const User = require("./models/user");
-const { Error } = require("mongoose");
-const { validateSignUpData } = require("./utils/validation");
-const bcrypt = require("bcrypt");
+const authRouter = require("./routes/authRouter");
+const profileRouter = require("./routes/profileRouter");
+const requestRouter = require("./routes/requestRouter");
 var cookieParser = require("cookie-parser");
-// var jwt = require("jsonwebtoken");
-const { userAuth } = require("./middlewares/auth");
-
 app.use(express.json());
 app.use(cookieParser());
+app.use(authRouter);
+app.use(profileRouter);
+app.use(requestRouter);
 
-// ADDING USERS TO DATABASE
-// Sign Up
-app.post("/signup", async (req, res) => {
-  try {
-    validateSignUpData(req);
-    const { firstName, lastName, email, password, age, skills } = req.body;
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = new User({
-      firstName,
-      lastName,
-      email,
-      password: passwordHash,
-      age,
-      skills,
-    }); //CREATING A NEW INSTANCE OF USER MODEL
-    await user.save(); //ADDING THE DATA TO DATABASE
-    res.send("User Added Successfully");
-    console.log(user);
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-});
+// DB AND SERVER CONNECTION
+connectDB()
+  .then(() => {
+    console.log("Cluster Connection Established Succesfully...");
+    app.listen(7777, () => {
+      console.log("app is listening to port 7777...");
+    });
+  })
+  .catch((err) => {
+    console.log("something went wrong!!");
+  });
 
-//Sign In
-app.post("/login", async (req, res) => {
-  try {
-    const { password, email } = req.body;
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      throw new Error("email not valid");
-    }
-    const isPasswordValid = await user.validatePassword(password); // CHECK PASSWORD IS MATCHING OR NOT
-    if (isPasswordValid) {
-      //--- JWT TOKEN ----
-      const token = await user.getJWT(); // 1- CREATE A JWT TOKEN
-      res.cookie("token", token); // 2- ADD THE TOKEN TO COOKIE AND SEND IT TO USER
-      res.send("Login Succesfull");
-    } else {
-      throw new Error("Password not valid");
-    }
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-});
 
-app.get("/profile", userAuth, async (req, res) => {
-  try {
-    const user = req.user;
-    res.send(user);
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-});
 
-app.get("/sendConnectionRequest", userAuth, async (req, res) => {
-  try {
-    const user = req.user;
-    res.send(user.lastName);
-  } catch (err) {
-    res.status(404).send("ERROR: " + err.message);
-  }
-});
 
+
+
+
+
+
+  
 // GETTING USERS FROM DATABASE
 // a) gettting one user
 // app.get("/user", async (req, res) => {
@@ -143,15 +100,3 @@ app.get("/sendConnectionRequest", userAuth, async (req, res) => {
 //     res.status(400).send("Something went wrong");
 //   }
 // });
-
-// DB AND SERVER CONNECTION
-connectDB()
-  .then(() => {
-    console.log("Cluster Connection Established Succesfully...");
-    app.listen(7777, () => {
-      console.log("app is listening to port 7777...");
-    });
-  })
-  .catch((err) => {
-    console.log("something went wrong!!");
-  });
