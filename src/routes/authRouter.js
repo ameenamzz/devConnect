@@ -8,7 +8,8 @@ const { Error } = require("mongoose");
 authRouter.post("/signup", async (req, res) => {
   try {
     validateSignUpData(req);
-    const { firstName, lastName, email, password, age, skills } = req.body;
+    const { firstName, lastName, email, password, age, skills, description } =
+      req.body;
     const passwordHash = await bcrypt.hash(password, 10);
     const user = new User({
       firstName,
@@ -17,6 +18,7 @@ authRouter.post("/signup", async (req, res) => {
       password: passwordHash,
       age,
       skills,
+      description,
     }); //CREATING A NEW INSTANCE OF USER MODEL
     await user.save(); //ADDING THE DATA TO DATABASE
     res.send("User Added Successfully");
