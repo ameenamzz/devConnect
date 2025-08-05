@@ -13,18 +13,35 @@ requestRouter.post(
       const fromUserId = user._id;
       const toUserId = req.params.toUserId;
       const status = req.params.status;
+
+      // 1 - STATUS VALIDATION
       const allowedStatus = ["interested", "ignored"];
       if (!allowedStatus.includes(status)) {
         throw new Error("invalid status");
       }
 
+      // 2 - VALIDATING TO USER EXIST
+      const toUser = await User.findById(toUserId);
+      if (!toUser) {
+        throw new Error("User Doesnt exist");
+      }
+
+      // 3 - VALIDATING CONNECTION REQUEST TO SAME USER
+      if (fromUserId.equals(toUserId)) {
+        throw new Error("Cannot Send Request to Yourself");
+      }
+      // OR
+      // if (fromUserId.toString() === toUserId.toString()) {
+      //   throw new Error("Cannot Send Request to Yourself");
+      // }
+
+      //4 - VALIDATING IS THERE EXISTING CONNECTIO ALREADY
       const existingConnection = await ConnectionRequest.findOne({
         $or: [
           { fromUserId, toUserId },
           { fromUserId: toUserId, toUserId: fromUserId },
         ],
       });
-
       if (existingConnection) {
         throw new Error("connection already exist");
       }
@@ -34,7 +51,6 @@ requestRouter.post(
         toUserId,
         status,
       });
-      const toUser = await User.findById(toUserId);
 
       await connectionRequest.save();
       res.send("request sent successfully");
