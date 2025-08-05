@@ -15,7 +15,7 @@ requestRouter.post(
       const status = req.params.status;
 
       // 1 - STATUS VALIDATION
-      const allowedStatus = ["interested", "ignored"];
+      const allowedStatus = ["interested", "ignore"];
       if (!allowedStatus.includes(status)) {
         throw new Error("invalid status");
       }
@@ -53,7 +53,10 @@ requestRouter.post(
       });
 
       await connectionRequest.save();
-      res.send("request sent successfully");
+
+      res.json({
+        message: status + "successfully",
+      });
     } catch (err) {
       res.status(404).send("ERROR: " + err.message);
     }
