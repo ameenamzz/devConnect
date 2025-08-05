@@ -13,17 +13,31 @@ requestRouter.post(
       const fromUserId = user._id;
       const toUserId = req.params.toUserId;
       const status = req.params.status;
+      const allowedStatus = ["interested", "ignored"];
+      if (!allowedStatus.includes(status)) {
+        throw new Error("invalid status");
+      }
+
+      const existingConnection = await ConnectionRequest.findOne({
+        $or: [
+          { fromUserId, toUserId },
+          { fromUserId: toUserId, toUserId: fromUserId },
+        ],
+      });
+
+      if (existingConnection) {
+        throw new Error("connection already exist");
+      }
+
       const connectionRequest = new ConnectionRequest({
         fromUserId,
         toUserId,
         status,
       });
-
       const toUser = await User.findById(toUserId);
-      console.log(toUser);
+
       await connectionRequest.save();
       res.send("request sent successfully");
-      // res.send("connection send successfully");
     } catch (err) {
       res.status(404).send("ERROR: " + err.message);
     }
