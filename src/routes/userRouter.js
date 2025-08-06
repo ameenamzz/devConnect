@@ -2,6 +2,8 @@ const express = require("express");
 const userRouter = express.Router();
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
+const { set } = require("mongoose");
 
 userRouter.get("/user/requests/received", userAuth, async (req, res) => {
   try {
@@ -50,6 +52,29 @@ userRouter.get("/user/connection", userAuth, async (req, res) => {
   } catch (error) {
     res.status(404).send("ERROR :" + error.message);
   }
+});
+
+userRouter.get("/feed", userAuth, async (req, res) => {
+  const loggedInUser = req.user;
+
+  const connectionRequest = await ConnectionRequest.find({
+    $or: [{ toUserId: loggedInUser._id }, { fromUserId: loggedInUser._id }],
+  }).select("fromUserId toUserId");
+
+  const hideUserFromFeed = new Set();
+  connectionRequest.forEach((req) => {
+    hideUserFromFeed.add(req.fromUserId.toString());
+    hideUserFromFeed.add(req.toUserId.toString());
+  });
+
+  const users = await User.find({
+    $and: [
+      { _id: { $nin: Array.from(hideUserFromFeed) } },
+      { _id: { $ne: loggedInUser._id } },
+    ],
+  }).select("firstName lastName age skills photoURL");
+
+  res.send(users);
 });
 
 module.exports = userRouter;
