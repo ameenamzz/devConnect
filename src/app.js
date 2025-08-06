@@ -4,12 +4,14 @@ const connectDB = require("./config/database");
 const authRouter = require("./routes/authRouter");
 const profileRouter = require("./routes/profileRouter");
 const requestRouter = require("./routes/requestRouter");
+const userRouter = require("./routes/userRouter");
 var cookieParser = require("cookie-parser");
 app.use(express.json());
 app.use(cookieParser());
 app.use(authRouter);
 app.use(profileRouter);
 app.use(requestRouter);
+app.use(userRouter);
 
 // DB AND SERVER CONNECTION
 connectDB()
@@ -23,15 +25,6 @@ connectDB()
     console.log("something went wrong!!");
   });
 
-
-
-
-
-
-
-
-
-  
 // GETTING USERS FROM DATABASE
 // a) gettting one user
 // app.get("/user", async (req, res) => {
