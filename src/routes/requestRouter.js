@@ -35,7 +35,7 @@ requestRouter.post(
       //   throw new Error("Cannot Send Request to Yourself");
       // }
 
-      //4 - VALIDATING IS THERE EXISTING CONNECTIO ALREADY
+      //4 - VALIDATING IS THERE EXISTING CONNECTION ALREADY
       const existingConnection = await ConnectionRequest.findOne({
         $or: [
           { fromUserId, toUserId },
