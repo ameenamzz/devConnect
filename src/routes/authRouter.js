@@ -44,7 +44,7 @@ authRouter.post("/login", async (req, res) => {
       throw new Error("Password not valid");
     }
   } catch (err) {
-    return res.status(401).send("Error " + err.message);
+    return res.status(401).send(err.message);
   }
 });
 
