@@ -25,9 +25,7 @@ profileRouter.post("/profile/edit", userAuth, async (req, res) => {
     const UpdatedProfile = Object.keys(req.body).forEach(
       (key) => (user[key] = bodyField[key])
     );
-    res.send(
-      user.firstName + user.lastName + " your profile Updated Successfully"
-    );
+    res.json({ data: user });
     await user.save();
     console.log(user);
   } catch (err) {
