@@ -24,7 +24,7 @@ app.use(userRouter);
 connectDB()
   .then(() => {
     console.log("Cluster Connection Established Succesfully...");
-    app.listen(7777, () => {
+    app.listen(process.env.PORT, () => {
       console.log("app is listening to port 7777...");
     });
   })
