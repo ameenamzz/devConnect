@@ -7,6 +7,7 @@ const requestRouter = require("./routes/requestRouter");
 const userRouter = require("./routes/userRouter");
 var cookieParser = require("cookie-parser");
 var cors = require("cors");
+require("./utils/cronjobs");
 app.use(
   cors({
     origin: "http://localhost:5173",
