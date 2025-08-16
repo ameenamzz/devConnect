@@ -7,6 +7,8 @@ const requestRouter = require("./routes/requestRouter");
 const userRouter = require("./routes/userRouter");
 var cookieParser = require("cookie-parser");
 var cors = require("cors");
+const http = require("http");
+const initializeSocket = require("./utils/socket");
 require("./utils/cronjobs");
 app.use(
   cors({
@@ -21,11 +23,14 @@ app.use(profileRouter);
 app.use(requestRouter);
 app.use(userRouter);
 
+const server = http.createServer(app);
+initializeSocket(server);
+
 // DB AND SERVER CONNECTION
 connectDB()
   .then(() => {
     console.log("Cluster Connection Established Succesfully...");
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log("app is listening to port 7777...");
     });
   })
