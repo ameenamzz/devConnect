@@ -35,7 +35,7 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.log("something went wrong!!");
+    console.log("something went wrong!!" + err);
   });
 
 // GETTING USERS FROM DATABASE
