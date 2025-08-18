@@ -5,10 +5,12 @@ const authRouter = require("./routes/authRouter");
 const profileRouter = require("./routes/profileRouter");
 const requestRouter = require("./routes/requestRouter");
 const userRouter = require("./routes/userRouter");
+const chatRouter = require("./routes/chat");
 var cookieParser = require("cookie-parser");
 var cors = require("cors");
 const http = require("http");
 const initializeSocket = require("./utils/socket");
+
 require("./utils/cronjobs");
 app.use(
   cors({
@@ -22,6 +24,7 @@ app.use(authRouter);
 app.use(profileRouter);
 app.use(requestRouter);
 app.use(userRouter);
+app.use(chatRouter);
 
 const server = http.createServer(app);
 initializeSocket(server);
