@@ -55,6 +55,11 @@ requestRouter.post(
 
       await connectionRequest.save();
 
+      const emailRes = await sendEmail.run(
+        "Connection Request Update",
+        `Your connection request has been ${status} by ${user.firstName}.`
+      );
+
       res.json({
         message: status + "successfully",
       });
