@@ -59,7 +59,7 @@ requestRouter.post(
         "Connection Request Update",
         `Your connection request has been ${status} by ${user.firstName}.`
       );
-      console.log(emailRes);
+
       res.json({
         message: status + "successfully",
       });
